@@ -1,5 +1,7 @@
 package ua.training.CruiseLineSpring.service;
 
+import java.time.Instant;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ua.training.CruiseLineSpring.dto.AuthenticationResponse;
 import ua.training.CruiseLineSpring.dto.LoginRequest;
+import ua.training.CruiseLineSpring.dto.RefreshTokenRequest;
 import ua.training.CruiseLineSpring.dto.RegisterRequest;
 import ua.training.CruiseLineSpring.entity.User;
 import ua.training.CruiseLineSpring.repository.UserRepository;
@@ -26,7 +29,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JWTProvider jwtProvider;
-    
+    private final RefreshTokenService refreshTokenService;
+
 	@Transactional
 	public void signup(RegisterRequest registerRequest) {
 		User user = new User();
@@ -37,15 +41,31 @@ public class AuthService {
 	}
 
 	public AuthenticationResponse login(LoginRequest loginRequest) {
-		Authentication authenticate = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authenticate);
-		String authenticationToken = jwtProvider.generateToken(authenticate);
-		return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
-	}
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String token = jwtProvider.generateToken(authenticate);
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(loginRequest.getUsername())
+                .build();
+    }
 
 
 	private String encodePassword(String password) {
 		return passwordEncoder.encode(password);
 	}
+
+	 public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+	        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+	        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+	        return AuthenticationResponse.builder()
+	                .authenticationToken(token)
+	                .refreshToken(refreshTokenRequest.getRefreshToken())
+	                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+	                .username(refreshTokenRequest.getUsername())
+	                .build();
+	    }
 }
