@@ -1,9 +1,13 @@
 package ua.training.CruiseLineSpring.controller;
 
+import static org.springframework.http.ResponseEntity.status;
+
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,17 +27,17 @@ public class ShipController {
 	private final ShipService shipService;
 	
 	@GetMapping
-	public List<ShipDto> getAllShip(){
-		return shipService.getAll();
+	public ResponseEntity<List<ShipDto>> getAllShip(){
+		return status(HttpStatus.OK).body(shipService.getAll());
 	}
 	
 	@GetMapping("/{id}")
-	public ShipDto getShip(@PathVariable Long id) {
-		return shipService.getShip(id);
+	public ResponseEntity<ShipDto> getShip(@PathVariable Long id) {
+		return status(HttpStatus.OK).body(shipService.getShip(id));
 	}
 	
 	@PostMapping
-	public ShipDto create(@RequestBody @Valid ShipDto shipDto) {
-		return shipService.save(shipDto);
+	public ResponseEntity<ShipDto> create(@RequestBody @Valid ShipDto shipDto) {
+		return status(HttpStatus.CREATED).body(shipService.save(shipDto));
 	}
 }

@@ -7,12 +7,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -21,10 +25,10 @@ public class Order {
 	@Id
 	@GeneratedValue(strategy = SEQUENCE)
 	private Long id;
-	@OneToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User client;
-	@OneToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ship_id", nullable = false)
 	private Ship ship;
 }
