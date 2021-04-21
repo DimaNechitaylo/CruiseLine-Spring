@@ -23,5 +23,6 @@ public class OrderController {
 	@PostMapping("/{shipId}")
 	public ResponseEntity<OrderDto> submitOrderRequest(@PathVariable Long shipId){
 		return status(HttpStatus.CREATED).body(orderService.submitOrderRequest(shipId));
-	}	
+	}
+	
 }

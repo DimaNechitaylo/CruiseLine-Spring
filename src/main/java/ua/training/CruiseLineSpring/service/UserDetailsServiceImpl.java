@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
+import ua.training.CruiseLineSpring.dto.UserDetailsImpl;
 import ua.training.CruiseLineSpring.entity.User;
 import ua.training.CruiseLineSpring.repository.UserRepository;
 
@@ -30,11 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		User user = userOptional
 				.orElseThrow(() -> new UsernameNotFoundException("No user " + "Found with username : " + username));
 
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), true,
-				true, true, true, getAuthorities("USER"));
+		return new UserDetailsImpl(user);
 	}
 
-	private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-		return singletonList(new SimpleGrantedAuthority(role));
-	}
 }

@@ -19,11 +19,11 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import ua.training.CruiseLineSpring.dto.UserDetailsImpl;
 import ua.training.CruiseLineSpring.exception.SpringCruiseLineException;
 
 @Service
@@ -46,8 +46,7 @@ public class JWTProvider {
 	}
 
 	public String generateToken(Authentication authentication) {
-		org.springframework.security.core.userdetails.User principal = (User) authentication.getPrincipal();
-		return Jwts.builder().setSubject(principal.getUsername())
+		UserDetailsImpl principal = (UserDetailsImpl) authentication.getPrincipal();		return Jwts.builder().setSubject(principal.getUsername())
 				.setIssuedAt(from(Instant.now()))
 				.signWith(getPrivateKey())
 				.setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))

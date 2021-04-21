@@ -17,6 +17,7 @@ import ua.training.CruiseLineSpring.dto.AuthenticationResponse;
 import ua.training.CruiseLineSpring.dto.LoginRequest;
 import ua.training.CruiseLineSpring.dto.RefreshTokenRequest;
 import ua.training.CruiseLineSpring.dto.RegisterRequest;
+import ua.training.CruiseLineSpring.entity.Role;
 import ua.training.CruiseLineSpring.entity.User;
 import ua.training.CruiseLineSpring.repository.UserRepository;
 import ua.training.CruiseLineSpring.security.JWTProvider;
@@ -34,9 +35,11 @@ public class AuthService {
 
 	@Transactional
 	public void signup(RegisterRequest registerRequest) {
-		User user = new User();
-		user.setUsername(registerRequest.getUsername());
-		user.setPassword(encodePassword(registerRequest.getPassword()));
+		User user = User.builder()
+				.username(registerRequest.getUsername())
+				.password(encodePassword(registerRequest.getPassword()))
+				.role(Role.USER)
+				.build();
 
 		userRepository.save(user);
 	}
@@ -62,6 +65,7 @@ public class AuthService {
 	 public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
 	        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
 	        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+	        System.out.println("\n\n\n\n---------------------\n\n"+token+"\n\n---------------------\n\n\n\n");
 	        return AuthenticationResponse.builder()
 	                .authenticationToken(token)
 	                .refreshToken(refreshTokenRequest.getRefreshToken())

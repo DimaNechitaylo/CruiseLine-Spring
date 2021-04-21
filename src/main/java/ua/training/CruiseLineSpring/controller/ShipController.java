@@ -40,4 +40,12 @@ public class ShipController {
 	public ResponseEntity<ShipDto> create(@RequestBody @Valid ShipDto shipDto) {
 		return status(HttpStatus.CREATED).body(shipService.save(shipDto));
 	}
+	
+	@GetMapping("/test")
+	public ResponseEntity<List<ShipDto>> getAllShipTest(){
+		List<ShipDto> test = shipService.getAll();
+		test.remove(0);
+		test.remove(1);
+		return status(HttpStatus.OK).body(test);
+	}
 }
