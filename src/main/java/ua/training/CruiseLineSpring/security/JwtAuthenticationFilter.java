@@ -1,4 +1,5 @@
 package ua.training.CruiseLineSpring.security;
+
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
@@ -21,67 +22,36 @@ import io.jsonwebtoken.JwtException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JWTProvider jwtProvider;
-    @Autowired
-    private UserDetailsService userDetailsService;
+	@Autowired
+	private JWTProvider jwtProvider;
+	@Autowired
+	private UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-		try {
-			String jwt = getJwtFromRequest(request);
-			if(checkFilterExceptions(request)) {
-				filterChain.doFilter(request, response);
-				return;
-			}
-			if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
-				authenticateUser(request, jwt);
-				filterChain.doFilter(request, response);
-				return;
-			}
-			throw new IllegalArgumentException("Auth token is null or empty");
-		} catch (NullPointerException | IllegalArgumentException | JwtException e) {
-			response.setStatus(401);
-			response.getWriter().write("401");
-		} 
-    }
+        String jwt = getJwtFromRequest(request);
 
-	private boolean checkFilterExceptions(HttpServletRequest request) {
-		String url = request.getRequestURL().toString();
-		return checkRefreshTokenException(url) || checkLoginException(url) || checkSignupException(url) || checkSignoffException(url);
-	}
+        if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
+            String username = jwtProvider.getUsernameFromJWT(jwt);
 
-	private boolean checkRefreshTokenException(String url) {
-		return url.contains("refresh/token");
-	}
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                    null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-	private boolean checkLoginException(String url) {
-		return url.contains("login");
-	}
-
-	private boolean checkSignupException(String url) {
-		return url.contains("singup");
-	}
-	
-	private boolean checkSignoffException(String url) {
-		return url.contains("logout");
-	}
-	private void authenticateUser(HttpServletRequest request, String jwt) {
-		String username = jwtProvider.getUsernameFromJWT(jwt);
-		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-				userDetails.getAuthorities());
-		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-	}
-    
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        return bearerToken;
+        filterChain.doFilter(request, response);
     }
+
+	private String getJwtFromRequest(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			return bearerToken.substring(7);
+		}
+		return bearerToken;
+	}
 }

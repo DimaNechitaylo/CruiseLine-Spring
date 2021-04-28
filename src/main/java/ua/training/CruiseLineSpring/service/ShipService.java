@@ -49,7 +49,9 @@ public class ShipService {
     }
 
     private Ship mapToShip(ShipDto shipDto) {
-        return Ship.builder().name(shipDto.getName())
+        return Ship.builder()
+        		.name(shipDto.getName())
+        		.passengerСapacity(shipDto.getPassengerСapacity())
         		.build();
     }
 

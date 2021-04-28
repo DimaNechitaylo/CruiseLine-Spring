@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ShipDto {
 	private Long id;
 	private String name;
+	private int passengerСapacity;
 }

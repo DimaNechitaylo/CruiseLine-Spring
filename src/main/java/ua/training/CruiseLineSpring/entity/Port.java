@@ -16,10 +16,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Ship {
+public class Port {
 	@Id
 	@GeneratedValue(strategy = SEQUENCE)
 	private Long id;
 	private String name;
-	private int passengerСapacity;
 }

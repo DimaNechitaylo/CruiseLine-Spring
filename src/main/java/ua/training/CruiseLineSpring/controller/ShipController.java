@@ -20,32 +20,48 @@ import ua.training.CruiseLineSpring.dto.ShipDto;
 import ua.training.CruiseLineSpring.service.ShipService;
 
 @RestController
-@RequestMapping("/api/ship")
+@RequestMapping("/api/ship/")
 @AllArgsConstructor
 public class ShipController {
 	
 	private final ShipService shipService;
 	
 	@GetMapping
-	public ResponseEntity<List<ShipDto>> getAllShip(){
+	public ResponseEntity<List<ShipDto>> getAllCruises(){
 		return status(HttpStatus.OK).body(shipService.getAll());
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ShipDto> getShip(@PathVariable Long id) {
+	public ResponseEntity<ShipDto> getCruise(@PathVariable Long id) {
 		return status(HttpStatus.OK).body(shipService.getShip(id));
 	}
 	
 	@PostMapping
-	public ResponseEntity<ShipDto> create(@RequestBody @Valid ShipDto shipDto) {
-		return status(HttpStatus.CREATED).body(shipService.save(shipDto));
+	public ResponseEntity<ShipDto> create(@RequestBody @Valid ShipDto cruiseDto) {
+		return status(HttpStatus.CREATED).body(shipService.save(cruiseDto));
 	}
 	
-	@GetMapping("/test")
-	public ResponseEntity<List<ShipDto>> getAllShipTest(){
-		List<ShipDto> test = shipService.getAll();
-		test.remove(0);
-		test.remove(1);
-		return status(HttpStatus.OK).body(test);
-	}
 }
+//@RestController
+//@RequestMapping("/cruise")
+//@AllArgsConstructor
+//public class CruiseController {
+//	
+//	private final CruiseService cruiseService;
+//	
+//	@GetMapping
+//	public ResponseEntity<List<CruiseDto>> getAllCruises(){
+//		return status(HttpStatus.OK).body(cruiseService.getAll());
+//	}
+//	
+//	@GetMapping("/{id}")
+//	public ResponseEntity<CruiseDto> getCruise(@PathVariable Long id) {
+//		return status(HttpStatus.OK).body(cruiseService.getCruiseDto(id));
+//	}
+//	
+//	@PostMapping
+//	public ResponseEntity<CruiseDto> create(@RequestBody @Valid CruiseDto cruiseDto) {
+//		return status(HttpStatus.CREATED).body(cruiseService.save(cruiseDto));
+//	}
+//
+//}
