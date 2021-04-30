@@ -17,6 +17,7 @@ import ua.training.CruiseLineSpring.dto.AuthenticationResponse;
 import ua.training.CruiseLineSpring.dto.LoginRequest;
 import ua.training.CruiseLineSpring.dto.RefreshTokenRequest;
 import ua.training.CruiseLineSpring.dto.RegisterRequest;
+import ua.training.CruiseLineSpring.dto.UserDetailsImpl;
 import ua.training.CruiseLineSpring.entity.Role;
 import ua.training.CruiseLineSpring.entity.User;
 import ua.training.CruiseLineSpring.repository.UserRepository;
@@ -65,7 +66,6 @@ public class AuthService {
 	 public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
 	        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
 	        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
-	        System.out.println("\n\n\n\n---------------------\n\n"+token+"\n\n---------------------\n\n\n\n");
 	        return AuthenticationResponse.builder()
 	                .authenticationToken(token)
 	                .refreshToken(refreshTokenRequest.getRefreshToken())
@@ -75,10 +75,10 @@ public class AuthService {
 	 }
 	 
 	 @Transactional(readOnly = true)
-		User getCurrentUser() {
-			org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder
-					.getContext().getAuthentication().getPrincipal();
-			return userRepository.findByUsername(principal.getUsername())
-					.orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
-		}
+	 public User getCurrentUser() {
+		 UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.
+	                getContext().getAuthentication().getPrincipal();
+	        return userRepository.findByUsername(principal.getUsername())
+	                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
+	    }
 }

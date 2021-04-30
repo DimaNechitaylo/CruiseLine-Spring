@@ -29,10 +29,23 @@ public class Order {
 	private Long id;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id", nullable = false)
-	private User client;
+	private User user;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "cruise_id", nullable = false)
 	private Cruise cruise;
 	@Enumerated(EnumType.STRING)
 	private Status status;
+	
+	public void denied() {
+		this.setStatus(Status.DENIED);
+	}
+	public void pay() {
+		this.setStatus(Status.PAID);
+	}
+	public void finish() {
+		this.setStatus(Status.FINISHED);
+	}
+	public void confirm() {
+		this.setStatus(Status.WATING_PAYMENT);
+	}
 }

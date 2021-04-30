@@ -37,5 +37,9 @@ public class Cruise {
 	private List<User> passengers;
 	private LocalDate start;
 	private LocalDate finish;
+	
+	public void addPassenger(User user) {
+		passengers.add(user);
+	}
 
 }
