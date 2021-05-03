@@ -34,18 +34,24 @@ public class Order {
 	@JoinColumn(name = "cruise_id", nullable = false)
 	private Cruise cruise;
 	@Enumerated(EnumType.STRING)
-	private Status status;
+	private OrderStatus status;
 	
 	public void denied() {
-		this.setStatus(Status.DENIED);
+		this.setStatus(OrderStatus.DENIED);
+	}
+	public void cancel() {
+		this.setStatus(OrderStatus.CANCELED);
 	}
 	public void pay() {
-		this.setStatus(Status.PAID);
+		this.setStatus(OrderStatus.PAID);
+	}
+	public void start() {
+		this.setStatus(OrderStatus.IN_PROCESS);
 	}
 	public void finish() {
-		this.setStatus(Status.FINISHED);
+		this.setStatus(OrderStatus.FINISHED);
 	}
 	public void confirm() {
-		this.setStatus(Status.WATING_PAYMENT);
+		this.setStatus(OrderStatus.WATING_PAYMENT);
 	}
 }

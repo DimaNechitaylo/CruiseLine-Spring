@@ -41,5 +41,8 @@ public class Cruise {
 	public void addPassenger(User user) {
 		passengers.add(user);
 	}
+	public void removePassenger(User user) {
+		passengers.remove(user);
+	}
 
 }

@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import ua.training.CruiseLineSpring.dto.OrderDto;
 import ua.training.CruiseLineSpring.entity.Cruise;
 import ua.training.CruiseLineSpring.entity.Order;
-import ua.training.CruiseLineSpring.entity.Status;
+import ua.training.CruiseLineSpring.entity.OrderStatus;
 import ua.training.CruiseLineSpring.entity.User;
 import ua.training.CruiseLineSpring.exception.CruiseNotFoundException;
 import ua.training.CruiseLineSpring.exception.OrderNotFoundException;
@@ -30,7 +30,7 @@ public class OrderService {
 		Cruise cruise = cruiseRepository.findById(cruiseId)
 				.orElseThrow(() -> new CruiseNotFoundException("Cruise not found with id -" + cruiseId));
 		Order order = orderRepository.save(
-				Order.builder().cruise(cruise).user(authService.getCurrentUser()).status(Status.PROCESSING).build());
+				Order.builder().cruise(cruise).user(authService.getCurrentUser()).status(OrderStatus.PROCESSING).build());
 		return mapToDto(order);
 	}
 
@@ -47,10 +47,23 @@ public class OrderService {
 		order.denied();
 		return mapToDto(orderRepository.save(order));
 	}
+	public OrderDto cancel(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
+		order.getCruise().removePassenger(authService.getCurrentUser());
+		order.cancel();
+		return mapToDto(orderRepository.save(order));
+	}
 	public OrderDto confirm(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
 		order.confirm();
+		return mapToDto(orderRepository.save(order));
+	}
+	public OrderDto start(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
+		order.start();
 		return mapToDto(orderRepository.save(order));
 	}
 	public OrderDto finish(Long orderId) {
