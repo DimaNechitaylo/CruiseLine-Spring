@@ -2,7 +2,9 @@ package ua.training.CruiseLineSpring.service;
 
 import static java.util.stream.Collectors.toList;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -33,6 +35,33 @@ public class CruiseService {
 				.map(this::mapToDto)
 				.collect(toList());
 	}
+	
+	public List<CruiseDto> filterByDate(LocalDate date) {
+		Optional<List<Cruise>> filteredCruiseOptional = cruiseRepository.findAllByStart(date);
+		List<Cruise> filteredCruise = filteredCruiseOptional.orElseThrow(() -> new CruiseNotFoundException("No orders " + "Found with this user"));
+		return filteredCruise
+				.stream()
+				.map(this::mapToDto)
+				.collect(toList());
+	}
+	
+	public List<CruiseDto> filter(LocalDate start, Long minDuration, Long maxDuration) {
+		Optional<List<Cruise>> filteredCruiseOptional = cruiseRepository.findAllByStartAndFinishBetween(start, start.plusDays(minDuration), start.plusDays(maxDuration));
+		List<Cruise> filteredCruise = filteredCruiseOptional.orElseThrow(() -> new CruiseNotFoundException("No orders " + "Found with this user"));
+		return filteredCruise
+				.stream()
+				.map(this::mapToDto)
+				.collect(toList());
+	}
+	public List<CruiseDto> filter(Long minDuration, Long maxDuration) {  //TODO fix invalid date subtraction
+		Optional<List<Cruise>> filteredCruiseOptional = cruiseRepository.findAllByFinishMinusStartBetween(minDuration, maxDuration);
+		List<Cruise> filteredCruise = filteredCruiseOptional.orElseThrow(() -> new CruiseNotFoundException("No orders " + "Found with this user"));
+		return filteredCruise
+				.stream()
+				.map(this::mapToDto)
+				.collect(toList());
+	}
+
 
 	@Transactional(readOnly = true)
 	public CruiseDto getCruiseDto(Long id) {
@@ -73,6 +102,7 @@ public class CruiseService {
         				.collect(Collectors.toList()))
         		.build();
     }
+
 
 
 }

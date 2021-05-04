@@ -14,6 +14,7 @@ import ua.training.CruiseLineSpring.entity.Order;
 import ua.training.CruiseLineSpring.entity.OrderStatus;
 import ua.training.CruiseLineSpring.entity.User;
 import ua.training.CruiseLineSpring.exception.CruiseNotFoundException;
+import ua.training.CruiseLineSpring.exception.ForbiddenOrderException;
 import ua.training.CruiseLineSpring.exception.OrderNotFoundException;
 import ua.training.CruiseLineSpring.repository.CruiseRepository;
 import ua.training.CruiseLineSpring.repository.OrderRepository;
@@ -35,12 +36,20 @@ public class OrderService {
 	}
 
 	public OrderDto pay(Long orderId) {
+		checkOwner(orderId, authService.getCurrentUser());
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
 		order.getCruise().addPassenger(authService.getCurrentUser());
 		order.pay();
 		return mapToDto(orderRepository.save(order));
 	}
+	
+	private boolean checkOwner(Long orderId, User user) {
+		orderRepository.findByUserAndIdAndStatusNot(authService.getCurrentUser(), orderId, OrderStatus.FINISHED)
+		.orElseThrow(() -> new ForbiddenOrderException("This order is not yours"));
+		return true;
+	}
+	
 	public OrderDto denied(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
@@ -81,7 +90,7 @@ public class OrderService {
 				.map(e -> mapToDto(e))
 				.collect(Collectors.toList());
 	}
-
+	
 	private OrderDto mapToDto(Order order) {
 		return OrderDto.builder().id(order.getId()).userId(order.getUser().getId())
 				.cruiseId(order.getCruise().getId()).status(order.getStatus()).build();

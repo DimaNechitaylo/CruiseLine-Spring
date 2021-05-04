@@ -21,40 +21,43 @@ import ua.training.CruiseLineSpring.service.OrderService;
 @RequestMapping("/order")
 @AllArgsConstructor
 public class OrderController {
-	
+
 	private final OrderService orderService;
-	
+
 	@PostMapping("/{cruiseId}")
-	public ResponseEntity<OrderDto> submitOrderRequest(@PathVariable Long cruiseId){
+	public ResponseEntity<OrderDto> submitOrderRequest(@PathVariable Long cruiseId) {
 		return status(HttpStatus.CREATED).body(orderService.submitOrderRequest(cruiseId));
 	}
-	
+
 	@GetMapping("/getUserOrders")
-	public ResponseEntity<List<OrderDto>> getUserOrders(){
+	public ResponseEntity<List<OrderDto>> getUserOrders() {
 		return status(HttpStatus.OK).body(orderService.getUserOrders());
 	}
 	
-	@PostMapping("/admin/confirm/{orderId}")
-	public ResponseEntity<OrderDto> confirm(@PathVariable Long orderId){
-		return status(HttpStatus.OK).body(orderService.confirm(orderId));
-	}
-	
+
 	@PostMapping("/pay/{orderId}")
-	public ResponseEntity<OrderDto> pay(@PathVariable Long orderId){
+	public ResponseEntity<OrderDto> pay(@PathVariable Long orderId) {
 		return status(HttpStatus.OK).body(orderService.pay(orderId));
 	}
-	
+
 	@PostMapping("/cancel/{orderId}")
-	public ResponseEntity<OrderDto> undo(@PathVariable Long orderId){
+	public ResponseEntity<OrderDto> undo(@PathVariable Long orderId) {
 		return status(HttpStatus.OK).body(orderService.cancel(orderId));
 	}
+
+	@PostMapping("/admin/confirm/{orderId}")
+	public ResponseEntity<OrderDto> confirm(@PathVariable Long orderId) {
+		return status(HttpStatus.OK).body(orderService.confirm(orderId));
+	}
+
 	@PostMapping("/admin/denied/{orderId}")
-	public ResponseEntity<OrderDto> denied(@PathVariable Long orderId){
+	public ResponseEntity<OrderDto> denied(@PathVariable Long orderId) {
 		return status(HttpStatus.OK).body(orderService.denied(orderId));
 	}
+
 	@PostMapping("/admin/finish/{orderId}")
-	public ResponseEntity<OrderDto> finish(@PathVariable Long orderId){
+	public ResponseEntity<OrderDto> finish(@PathVariable Long orderId) {
 		return status(HttpStatus.OK).body(orderService.finish(orderId));
 	}
-	
+
 }
