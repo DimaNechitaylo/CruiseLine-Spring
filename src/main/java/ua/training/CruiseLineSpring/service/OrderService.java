@@ -30,8 +30,8 @@ public class OrderService {
 	public OrderDto submitOrderRequest(Long cruiseId) {
 		Cruise cruise = cruiseRepository.findById(cruiseId)
 				.orElseThrow(() -> new CruiseNotFoundException("Cruise not found with id -" + cruiseId));
-		Order order = orderRepository.save(
-				Order.builder().cruise(cruise).user(authService.getCurrentUser()).status(OrderStatus.PROCESSING).build());
+		Order order = orderRepository.save(Order.builder().cruise(cruise).user(authService.getCurrentUser())
+				.status(OrderStatus.PROCESSING).build());
 		return mapToDto(order);
 	}
 
@@ -43,19 +43,20 @@ public class OrderService {
 		order.pay();
 		return mapToDto(orderRepository.save(order));
 	}
-	
+
 	private boolean checkOwner(Long orderId, User user) {
 		orderRepository.findByUserAndIdAndStatusNot(authService.getCurrentUser(), orderId, OrderStatus.FINISHED)
-		.orElseThrow(() -> new ForbiddenOrderException("This order is not yours"));
+				.orElseThrow(() -> new ForbiddenOrderException("This order is not yours"));
 		return true;
 	}
-	
+
 	public OrderDto denied(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
 		order.denied();
 		return mapToDto(orderRepository.save(order));
 	}
+
 	public OrderDto cancel(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
@@ -63,39 +64,42 @@ public class OrderService {
 		order.cancel();
 		return mapToDto(orderRepository.save(order));
 	}
+
 	public OrderDto confirm(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
 		order.confirm();
 		return mapToDto(orderRepository.save(order));
 	}
+
 	public OrderDto start(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
 		order.start();
 		return mapToDto(orderRepository.save(order));
 	}
-	public OrderDto finish(Long orderId) {
-		Order order = orderRepository.findById(orderId)
-				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
-		order.finish();
-		return mapToDto(orderRepository.save(order));
+
+//	public OrderDto finish(Long orderId) {
+//		Order order = orderRepository.findById(orderId)
+//				.orElseThrow(() -> new OrderNotFoundException("Cruise not found with id -" + orderId));
+//		order.finish();
+//		return mapToDto(orderRepository.save(order));
+//	}
+	public void finish() {
+		orderRepository.finishCruises(OrderStatus.FINISHED.toString());
 	}
-	
+
 	@Transactional(readOnly = true)
 	public List<OrderDto> getUserOrders() {
 		Optional<List<Order>> usersOrdersOptional = orderRepository.findByUser(authService.getCurrentUser());
-		List<Order> usersOrders = usersOrdersOptional.orElseThrow(() -> new OrderNotFoundException("No orders " + "Found with this user"));
-		return usersOrders.stream()
-				.map(e -> mapToDto(e))
-				.collect(Collectors.toList());
+		List<Order> usersOrders = usersOrdersOptional
+				.orElseThrow(() -> new OrderNotFoundException("No orders " + "Found with this user"));
+		return usersOrders.stream().map(e -> mapToDto(e)).collect(Collectors.toList());
 	}
-	
+
 	private OrderDto mapToDto(Order order) {
-		return OrderDto.builder().id(order.getId()).userId(order.getUser().getId())
-				.cruiseId(order.getCruise().getId()).status(order.getStatus()).build();
+		return OrderDto.builder().id(order.getId()).userId(order.getUser().getId()).cruiseId(order.getCruise().getId())
+				.status(order.getStatus()).build();
 	}
-
-
 
 }

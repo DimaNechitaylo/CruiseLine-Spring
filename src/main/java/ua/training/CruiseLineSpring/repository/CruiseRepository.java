@@ -14,7 +14,7 @@ public interface CruiseRepository extends JpaRepository<Cruise, Long> {
 	Optional<List<Cruise>> findAllByStart(LocalDate start);
 	Optional<List<Cruise>> findAllByStartAndFinishBetween(LocalDate start, LocalDate finish1,  LocalDate finish2);
 	
-	@Query(value = "select * from cruise c where finish-start between :minDuration and :maxDuration",
+	@Query(value = "select * from cruise where DATEDIFF(finish, start) between :minDuration and :maxDuration",
 			nativeQuery = true)
 	Optional<List<Cruise>> findAllByFinishMinusStartBetween(Long minDuration,  Long maxDuration);
 

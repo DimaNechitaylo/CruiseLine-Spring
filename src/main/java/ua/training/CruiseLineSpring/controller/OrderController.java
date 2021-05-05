@@ -55,9 +55,9 @@ public class OrderController {
 		return status(HttpStatus.OK).body(orderService.denied(orderId));
 	}
 
-	@PostMapping("/admin/finish/{orderId}")
-	public ResponseEntity<OrderDto> finish(@PathVariable Long orderId) {
-		return status(HttpStatus.OK).body(orderService.finish(orderId));
-	}
+//	@PostMapping("/admin/finish/{orderId}")
+//	public ResponseEntity<OrderDto> finish(@PathVariable Long orderId) {
+//		return status(HttpStatus.OK).body(orderService.finish(orderId));
+//	}
 
 }
