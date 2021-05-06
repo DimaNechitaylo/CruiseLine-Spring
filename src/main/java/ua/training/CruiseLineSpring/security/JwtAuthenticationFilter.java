@@ -31,7 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String jwt = getJwtFromRequest(request);
+       try {
+    	String jwt = getJwtFromRequest(request);
+    	
+    	if(checkFilterExceptions(request)) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
         if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
             String username = jwtProvider.getUsernameFromJWT(jwt);
@@ -44,8 +50,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
+       } catch (NullPointerException | IllegalArgumentException | JwtException e) {
+			response.setStatus(403);
+			response.getWriter().write("403 Forbidden");
+       }
     }
 
+    private boolean checkFilterExceptions(HttpServletRequest request) {
+		String url = request.getRequestURL().toString();
+		return checkRefreshTokenException(url) || checkLoginException(url) || checkSignupException(url) || checkSignoffException(url);
+	}
+    
+    private boolean checkRefreshTokenException(String url) {
+		return url.contains("refresh/token");
+	}
+
+	private boolean checkLoginException(String url) {
+		return url.contains("login");
+	}
+
+	private boolean checkSignupException(String url) {
+		return url.contains("sign-up");
+	}
+	
+	private boolean checkSignoffException(String url) {
+		return url.contains("logout");
+	}
+    
 	private String getJwtFromRequest(HttpServletRequest request) {
 		String bearerToken = request.getHeader("Authorization");
 
