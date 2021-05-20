@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import ua.training.CruiseLineSpring.dto.CruiseDto;
+import ua.training.CruiseLineSpring.dto.OrderDto;
 import ua.training.CruiseLineSpring.service.CruiseService;
 
 @RestController
@@ -39,14 +40,14 @@ public class CruiseController {
 		return status(HttpStatus.OK).body(cruiseService.getCruiseDto(id));
 	}
 	
-	@PostMapping
+	@PostMapping("/admin")
 	public ResponseEntity<CruiseDto> create(@RequestBody @Valid CruiseDto cruiseDto) {
 		return status(HttpStatus.CREATED).body(cruiseService.save(cruiseDto));
 	}
 	
 	@GetMapping("/filter")
 	public ResponseEntity<List<CruiseDto>> filter(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
-			, @RequestParam(required = false, defaultValue = "0") Long minDuration, @RequestParam(required = false, defaultValue = Long.MAX_VALUE+"") Long maxDuration) {
+			, @RequestParam(required = false, defaultValue = "0") Long minDuration, @RequestParam(required = false, defaultValue = Long.SIZE+"") Long maxDuration) {
 		return status(HttpStatus.OK).body(date == null ? cruiseService.filter(minDuration, maxDuration) : cruiseService.filter(date, minDuration, maxDuration));
 	}
 

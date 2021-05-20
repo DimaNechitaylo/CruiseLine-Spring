@@ -3,9 +3,9 @@ package ua.training.CruiseLineSpring.entity;
 public enum OrderStatus {
 	PROCESSING,
 	WATING_PAYMENT,
-	IN_PROCESS,
+	STARTED,
 	PAID,
 	FINISHED,
 	CANCELED,
-	DENIED
+	REJECTED
 }

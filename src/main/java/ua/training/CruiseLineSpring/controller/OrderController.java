@@ -1,5 +1,6 @@
 package ua.training.CruiseLineSpring.controller;
 
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.status;
 
 import java.util.List;
@@ -24,9 +25,9 @@ public class OrderController {
 
 	private final OrderService orderService;
 
-	@PostMapping("/{cruiseId}")
-	public ResponseEntity<OrderDto> submitOrderRequest(@PathVariable Long cruiseId) {
-		return status(HttpStatus.CREATED).body(orderService.submitOrderRequest(cruiseId));
+	@GetMapping("/{cruiseId}")
+	public ResponseEntity<OrderDto> getOrderById(@PathVariable Long cruiseId) {
+		return ResponseEntity.status(OK).body(orderService.getOrderByCruiseIdAndUserId(cruiseId));
 	}
 
 	@GetMapping("/getUserOrders")
@@ -34,30 +35,34 @@ public class OrderController {
 		return status(HttpStatus.OK).body(orderService.getUserOrders());
 	}
 	
+	@GetMapping("/submit/{cruiseId}")
+	public ResponseEntity<OrderDto> submitOrderRequest(@PathVariable Long cruiseId) {
+		return ResponseEntity.status(OK).body(orderService.submitOrderRequest(cruiseId));
+	}
 
-	@PostMapping("/pay/{orderId}")
+	@GetMapping("/pay/{orderId}")
 	public ResponseEntity<OrderDto> pay(@PathVariable Long orderId) {
 		return status(HttpStatus.OK).body(orderService.pay(orderId));
 	}
 
-	@PostMapping("/cancel/{orderId}")
+	@GetMapping("/cancel/{orderId}")
 	public ResponseEntity<OrderDto> undo(@PathVariable Long orderId) {
 		return status(HttpStatus.OK).body(orderService.cancel(orderId));
 	}
+	
+	@GetMapping("/admin/getGetOrderForVerification")
+	public ResponseEntity<List<OrderDto>> getGetOrderForVerification() {
+		return status(HttpStatus.OK).body(orderService.getGetOrderForVerification());
+	}
 
-	@PostMapping("/admin/confirm/{orderId}")
+	@GetMapping("/admin/confirm/{orderId}")
 	public ResponseEntity<OrderDto> confirm(@PathVariable Long orderId) {
 		return status(HttpStatus.OK).body(orderService.confirm(orderId));
 	}
 
-	@PostMapping("/admin/denied/{orderId}")
+	@GetMapping("/admin/reject/{orderId}")
 	public ResponseEntity<OrderDto> denied(@PathVariable Long orderId) {
-		return status(HttpStatus.OK).body(orderService.denied(orderId));
+		return status(HttpStatus.OK).body(orderService.reject(orderId));
 	}
-
-//	@PostMapping("/admin/finish/{orderId}")
-//	public ResponseEntity<OrderDto> finish(@PathVariable Long orderId) {
-//		return status(HttpStatus.OK).body(orderService.finish(orderId));
-//	}
 
 }

@@ -28,6 +28,7 @@ public class Cruise {
 	@Id
 	@GeneratedValue(strategy = SEQUENCE)
 	private Long id;
+	private String name;
 	@ManyToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinColumn(name="ship_id", nullable = false)
 	private Ship ship;

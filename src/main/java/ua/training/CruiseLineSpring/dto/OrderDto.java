@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ua.training.CruiseLineSpring.entity.Cruise;
 import ua.training.CruiseLineSpring.entity.OrderStatus;
 
 @Data
@@ -13,6 +14,6 @@ import ua.training.CruiseLineSpring.entity.OrderStatus;
 public class OrderDto {
 	private Long id;
 	private Long userId;
-	private Long cruiseId;
+	private CruiseDto cruiseDto;
 	private OrderStatus status;
 }

@@ -36,8 +36,8 @@ public class Order {
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 	
-	public void denied() {
-		this.setStatus(OrderStatus.DENIED);
+	public void reject() {
+		this.setStatus(OrderStatus.REJECTED);
 	}
 	public void cancel() {
 		this.setStatus(OrderStatus.CANCELED);
@@ -46,7 +46,7 @@ public class Order {
 		this.setStatus(OrderStatus.PAID);
 	}
 	public void start() {
-		this.setStatus(OrderStatus.IN_PROCESS);
+		this.setStatus(OrderStatus.STARTED);
 	}
 	public void finish() {
 		this.setStatus(OrderStatus.FINISHED);

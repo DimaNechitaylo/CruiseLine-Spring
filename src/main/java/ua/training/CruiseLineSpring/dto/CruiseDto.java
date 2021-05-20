@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CruiseDto {
 	private Long id;
+	private String name;
 	private Long shipId;
 	private int passengersCount;
 	private int availableCount;

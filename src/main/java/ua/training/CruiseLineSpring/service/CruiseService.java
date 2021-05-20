@@ -14,8 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
 import ua.training.CruiseLineSpring.dto.CruiseDto;
+import ua.training.CruiseLineSpring.dto.OrderDto;
 import ua.training.CruiseLineSpring.entity.Cruise;
+import ua.training.CruiseLineSpring.entity.Order;
 import ua.training.CruiseLineSpring.exception.CruiseNotFoundException;
+import ua.training.CruiseLineSpring.exception.OrderNotFoundException;
 import ua.training.CruiseLineSpring.repository.CruiseRepository;
 import ua.training.CruiseLineSpring.repository.ShipRepository;
 
@@ -26,6 +29,8 @@ public class CruiseService {
 	private final CruiseRepository cruiseRepository;
 	private final ShipRepository shipRepository;
 	private final PortService portService;
+	private final AuthService authService;
+
 
 	
 	@Transactional(readOnly = true)
@@ -77,9 +82,17 @@ public class CruiseService {
 		return CruiseDto;
 	}
 	
-	private CruiseDto mapToDto(Cruise cruise) {
+	public Cruise getCruiseByIdNotBookined(Long cruiseId){
+		return cruiseRepository.findByIdNotBookined(cruiseId, authService.getCurrentUser().getId())
+				.orElseThrow(() -> new CruiseNotFoundException("Cruise not found with id -" + cruiseId));
+
+	}
+
+	
+	public CruiseDto mapToDto(Cruise cruise) {
         return CruiseDto.builder()
         		.id(cruise.getId())
+        		.name(cruise.getName())
         		.passengersCount(cruise.getPassengers().size())
         		.availableCount(cruise.getShip().getPassengerСapacity() - cruise.getPassengers().size())
         		.shipId(cruise.getShip().getId())
@@ -94,6 +107,7 @@ public class CruiseService {
 	private Cruise mapToCruise(CruiseDto cruiseDto) {
         return Cruise.builder()
         		.ship(shipRepository.getOne(cruiseDto.getShipId()))
+        		.name(cruiseDto.getName())
         		.start(cruiseDto.getStart())
         		.finish(cruiseDto.getFinish())
         		.ports(cruiseDto.getPortsId()
@@ -103,6 +117,11 @@ public class CruiseService {
         		.build();
     }
 
-
-
+	public List<CruiseDto> getUserCruises() {
+		Optional<List<Cruise>> userCruisesOptional = cruiseRepository.findUserCruisesByOrders(authService.getCurrentUser().getId());
+		List<Cruise> userCruise = userCruisesOptional
+				.orElseThrow(() -> new CruiseNotFoundException("No cruise orders found with this user"));
+		return userCruise.stream().map(e -> mapToDto(e)).collect(Collectors.toList());
+	}
+	
 }
